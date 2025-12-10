@@ -915,7 +915,7 @@ const Board = () => {
                 style={{ touchAction: 'none' }} 
             />
         </div>
-    );
+    );  
 };
 
 export default Board;

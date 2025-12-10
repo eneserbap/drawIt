@@ -1,16 +1,101 @@
-# React + Vite
+# DrawIt – RoughJS Tabanlı React Çizim Uygulaması ✏️
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Modern, hızlı ve sezgisel bir canvas çizim uygulamasıdır.
+RoughJS kullanarak “elde çizilmiş” hissi veren şekiller üretir.
+Klavye kısayolları, metin araçları, proje kaydetme/yükleme gibi birçok gelişmiş özelliğe sahiptir.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🚀 Özellikler
 
-## React Compiler
+### 🖍️ Çizim Araçları
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+* **Pencil (P)** – Basit, hızlı serbest çizim
+* **Rectangle (R)** – RoughJS ile elde çizilmiş dikdörtgen
+* **Arrow (A)** – Ok çizme (otomatik üçgen başlıklı)
+* **Text (T)** – Yazı ekleme, canlı imleç
+* **Selection (V)** – Nesne taşıma
+* **Eraser (E)** – Nesne silme
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## 🎨 Görsel Özellikler
+
+* Renk seçme
+* Kalem kalınlığı ayarı
+* Metin boyutu ayarı
+* RoughJS ile “rough” stil oluşturma
+
+---
+
+## 💾 Kaydetme & Yükleme
+
+* **Proje kaydetme (.drawit)**
+* **Proje yükleme**
+* **PNG / JPEG dışa aktarma**
+
+---
+
+## ⌨️ Klavye Kısayolları
+
+| Kısayol                | İşlev              |
+| ---------------------- | ------------------ |
+| **P**                  | Pencil             |
+| **R**                  | Rectangle          |
+| **A**                  | Arrow              |
+| **T**                  | Text               |
+| **V**                  | Selection          |
+| **E**                  | Eraser             |
+| **Ctrl + Z**           | Geri al            |
+| **Delete / Backspace** | Seçili nesneyi sil |
+| **Ctrl + S**           | Export menüsü      |
+| **?**                  | Kısayol menüsü     |
+
+---
+
+## 🛠️ Teknolojiler
+
+* **React**
+* **RoughJS**
+* **Lucide-React** (ikonlar)
+* Canvas API
+
+---
+
+## 📦 Kurulum
+
+```bash
+git clone <repo-link>
+cd project-folder
+npm install
+npm start
+```
+
+---
+
+## 📁 Dosya Yapısı
+
+* `Board.jsx` → Tüm çizim mantığı
+* Canvas render + RoughJS entegrasyonu
+* Undo, selection, eraser, text editor, export ve daha fazlası
+
+---
+
+## 🖼️ Ekran Görüntüsü *(Opsiyonel)*
+
+> Uygulamadan bir screenshot alıp buraya ekleyebilirsin.
+
+---
+
+## 📝 Lisans
+
+MIT
+
+---
+
+## ⭐ Katkı
+
+PR'ler memnuniyetle karşılanır!
+
+## Canlı Demo
+https://drawitt.vercel.app
