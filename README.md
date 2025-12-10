@@ -81,9 +81,10 @@ npm start
 
 ---
 
-## 🖼️ Ekran Görüntüsü *(Opsiyonel)*
+## 🖼️ Ekran Görüntüsü 
 
-> Uygulamadan bir screenshot alıp buraya ekleyebilirsin.
+<img width="1868" height="892" alt="DrawItSS" src="https://github.com/user-attachments/assets/8c3d84c7-3aa9-4c9a-a4de-136dce0ce003" />
+
 
 ---
 
@@ -92,10 +93,6 @@ npm start
 MIT
 
 ---
-
-## ⭐ Katkı
-
-PR'ler memnuniyetle karşılanır!
 
 ## Canlı Demo
 https://drawitt.vercel.app
