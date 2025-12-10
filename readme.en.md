@@ -23,7 +23,6 @@ It includes advanced features such as keyboard shortcuts, text tools, project sa
 * Color selection
 * Adjustable stroke width
 * Text size customization
-* RoughJS “rough” hand-drawn style rendering
 
 ---
 
