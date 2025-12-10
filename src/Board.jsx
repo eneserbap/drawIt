@@ -81,11 +81,9 @@ const Board = () => {
     // İmleç yanıp sönmesi
     useEffect(() => {
         if (!textMode) return;
-        
         const interval = setInterval(() => {
             setCursorVisible(prev => !prev);
         }, 500);
-        
         return () => clearInterval(interval);
     }, [textMode]);
 
@@ -106,7 +104,7 @@ const Board = () => {
             if (textMode) {
                 event.preventDefault();
                 event.stopPropagation();
-                
+
                 if (event.key === 'Enter') {
                     finishText();
                 } else if (event.key === 'Escape') {
@@ -115,11 +113,11 @@ const Board = () => {
                     setTextContent(prev => prev.slice(0, -1));
                 } else if (event.key === 'Tab') {
                     event.preventDefault();
-                } else if (event.key.length === 1 || 
-                          event.key === ' ' || 
-                          event.key.includes('Arrow') ||
-                          event.key.includes('Digit') ||
-                          event.key.includes('Numpad')) {
+                } else if (event.key.length === 1 ||
+                    event.key === ' ' ||
+                    event.key.includes('Arrow') ||
+                    event.key.includes('Digit') ||
+                    event.key.includes('Numpad')) {
                     if (event.key === ' ') {
                         setTextContent(prev => prev + ' ');
                     } else if (!event.ctrlKey && !event.metaKey && !event.altKey) {
@@ -220,9 +218,9 @@ const Board = () => {
                 const textWidth = ctx.measureText(textContent).width;
                 ctx.fillStyle = strokeColor;
                 ctx.fillRect(
-                    textPos.x + textWidth, 
-                    textPos.y, 
-                    2, 
+                    textPos.x + textWidth,
+                    textPos.y,
+                    2,
                     textSize
                 );
             }
@@ -277,8 +275,7 @@ const Board = () => {
 
     const copySelectedElement = () => {
         if (selectedElement) {
-            // Elementi kopyala
-            setCopiedElement({...selectedElement});
+            setCopiedElement({ ...selectedElement });
             console.log("Element kopyalandı:", selectedElement);
         } else {
             console.log("Kopyalamak için önce bir element seç!");
@@ -287,45 +284,41 @@ const Board = () => {
 
     const pasteCopiedElement = () => {
         if (copiedElement) {
-            const offset = 20; // Yapıştırılan elementi biraz kaydır
-            
-            // Yeni bir kopya oluştur
+            const offset = 20;
             const newElement = {
                 ...copiedElement,
-                id: Date.now(), // Yeni bir ID ver
+                id: Date.now(),
                 x: copiedElement.x + offset,
                 y: copiedElement.y + offset,
             };
-            
-            // Element tipine göre pozisyonları ayarla
+
             if (copiedElement.type === 'arrow') {
                 newElement.x1 = copiedElement.x1 + offset;
                 newElement.y1 = copiedElement.y1 + offset;
                 newElement.x2 = copiedElement.x2 + offset;
                 newElement.y2 = copiedElement.y2 + offset;
                 newElement.roughElement = generateArrow(newElement.x1, newElement.y1, newElement.x2, newElement.y2, newElement.strokeColor || strokeColor);
-            } 
+            }
             else if (copiedElement.type === 'rectangle') {
-                newElement.roughElement = generator.rectangle(newElement.x, newElement.y, newElement.width, newElement.height, { 
-                    stroke: newElement.strokeColor || strokeColor, 
-                    strokeWidth: 3 
+                newElement.roughElement = generator.rectangle(newElement.x, newElement.y, newElement.width, newElement.height, {
+                    stroke: newElement.strokeColor || strokeColor,
+                    strokeWidth: 3
                 });
-            } 
+            }
             else if (copiedElement.type === 'pencil') {
                 newElement.points = copiedElement.points.map(p => [p[0] + offset, p[1] + offset]);
-                newElement.roughElement = generator.linearPath(newElement.points, { 
-                    stroke: newElement.strokeColor || strokeColor, 
-                    strokeWidth: 2, 
-                    roughness: 0.5 
+                newElement.roughElement = generator.linearPath(newElement.points, {
+                    stroke: newElement.strokeColor || strokeColor,
+                    strokeWidth: 2,
+                    roughness: 0.5
                 });
             }
             else if (copiedElement.type === 'text') {
-                // Text elementini kopyala
-                newElement.roughElement = null; // Text için roughElement yok
+                newElement.roughElement = null;
             }
-            
+
             setElements(prev => [...prev, newElement]);
-            setSelectedElement(newElement); // Yapıştırılan elementi seç
+            setSelectedElement(newElement);
             console.log("Element yapıştırıldı:", newElement);
         } else {
             console.log("Yapıştırmak için önce bir element kopyala!");
@@ -335,7 +328,7 @@ const Board = () => {
     const exportAsPNG = () => {
         const canvas = canvasRef.current;
         if (!canvas) return;
-        
+
         const link = document.createElement('a');
         link.download = `drawit-${new Date().getTime()}.png`;
         link.href = canvas.toDataURL('image/png');
@@ -346,19 +339,19 @@ const Board = () => {
     const exportAsJPEG = () => {
         const canvas = canvasRef.current;
         if (!canvas) return;
-        
+
         const link = document.createElement('a');
         link.download = `drawit-${new Date().getTime()}.jpg`;
-        
+
         const tempCanvas = document.createElement('canvas');
         tempCanvas.width = canvas.width;
         tempCanvas.height = canvas.height;
         const tempCtx = tempCanvas.getContext('2d');
-        
+
         tempCtx.fillStyle = '#ffffff';
         tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
         tempCtx.drawImage(canvas, 0, 0);
-        
+
         link.href = tempCanvas.toDataURL('image/jpeg', 0.9);
         link.click();
         setShowExportMenu(false);
@@ -374,7 +367,7 @@ const Board = () => {
             version: '1.0',
             timestamp: new Date().toISOString()
         };
-        
+
         const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
         const link = document.createElement('a');
         link.download = `drawit-project-${new Date().getTime()}.drawit`;
@@ -386,7 +379,7 @@ const Board = () => {
     const loadProject = (event) => {
         const file = event.target.files[0];
         if (!file) return;
-        
+
         const reader = new FileReader();
         reader.onload = (e) => {
             try {
@@ -401,9 +394,40 @@ const Board = () => {
         reader.readAsText(file);
     };
 
-    const startDrawing = ({ nativeEvent }) => {
-        const { offsetX, offsetY } = nativeEvent;
+    // --- YENİ EKLENEN KISIM: KOORDİNAT HESAPLAYICI ---
+    const getCoordinates = (event) => {
+        const canvas = canvasRef.current;
         
+        // Touch events
+        if (event.touches && event.touches.length > 0) {
+            const rect = canvas.getBoundingClientRect();
+            return {
+                x: event.touches[0].clientX - rect.left,
+                y: event.touches[0].clientY - rect.top
+            };
+        } else if (event.changedTouches && event.changedTouches.length > 0) {
+            // Touch end event
+            const rect = canvas.getBoundingClientRect();
+            return {
+                x: event.changedTouches[0].clientX - rect.left,
+                y: event.changedTouches[0].clientY - rect.top
+            };
+        }
+        
+        // Mouse events
+        return {
+            x: event.nativeEvent.offsetX,
+            y: event.nativeEvent.offsetY
+        };
+    };
+    // ------------------------------------------------
+
+    const startDrawing = (event) => {
+        // Telefonda kaydırmayı engelle
+        if(event.cancelable) event.preventDefault();
+
+        const { x: offsetX, y: offsetY } = getCoordinates(event);
+
         if (textMode) {
             finishText();
             return;
@@ -441,10 +465,13 @@ const Board = () => {
         }
     };
 
-    const draw = ({ nativeEvent }) => {
+    const draw = (event) => {
+        // Telefonda kaydırmayı engelle
+        if(event.cancelable) event.preventDefault();
+        
         if (textMode) return;
 
-        const { offsetX, offsetY } = nativeEvent;
+        const { x: offsetX, y: offsetY } = getCoordinates(event);
         const canvas = canvasRef.current;
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
@@ -459,7 +486,7 @@ const Board = () => {
                 const index = elementsCopy.findIndex(el => el === selectedElement);
                 if (index === -1) return prevElements;
                 const el = elementsCopy[index];
-                
+
                 const currentColor = el.strokeColor || strokeColor;
 
                 if (el.type === 'rectangle') {
@@ -487,10 +514,10 @@ const Board = () => {
                     const roughElement = generator.linearPath(movedPoints, { stroke: currentColor, strokeWidth: 2, roughness: 0.5 });
                     elementsCopy[index] = { ...el, x: newX, y: newY, points: movedPoints, roughElement };
                 } else if (el.type === 'text') {
-                    elementsCopy[index] = { 
-                        ...el, 
-                        x: el.x + deltaX, 
-                        y: el.y + deltaY 
+                    elementsCopy[index] = {
+                        ...el,
+                        x: el.x + deltaX,
+                        y: el.y + deltaY
                     };
                 }
                 return elementsCopy;
@@ -567,8 +594,13 @@ const Board = () => {
         }
     };
 
-    const stopDrawing = ({ nativeEvent }) => {
+    const stopDrawing = (event) => {
+        // Telefonda kaydırmayı engelle
+        if(event.cancelable) event.preventDefault();
+
         if (textMode) return;
+
+        const { x: offsetX, y: offsetY } = getCoordinates(event);
 
         if (action === 'moving') {
             setSelectedElement(null);
@@ -583,8 +615,6 @@ const Board = () => {
         }
 
         if (action !== 'drawing') return;
-
-        const { offsetX, offsetY } = nativeEvent;
 
         let newElement = null;
 
@@ -666,7 +696,8 @@ const Board = () => {
             className="h-screen w-screen overflow-hidden bg-white"
             style={{
                 backgroundImage: 'radial-gradient(#ccc 1px, transparent 1px)',
-                backgroundSize: '20px 20px'
+                backgroundSize: '20px 20px',
+                touchAction: 'none' // Tüm sayfa için de ek önlem
             }}
         >
             {elements.length === 0 && (
@@ -680,8 +711,8 @@ const Board = () => {
             )}
 
             {textMode && (
-                <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-black text-white px-4 py-2 rounded-lg text-sm">
-                    Yazı Modu: Yazmaya başla (Enter: Kaydet, Esc: İptal, Backspace: Sil)
+                <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-black text-white px-4 py-2 rounded-lg text-sm z-50 whitespace-nowrap">
+                    Yazı Modu: (Enter: Kaydet)
                 </div>
             )}
 
@@ -716,7 +747,7 @@ const Board = () => {
                             Projeyi kaydet (.drawit)
                         </button>
                         <div className="relative">
-                            <inputs
+                            <input
                                 type="file"
                                 id="project-upload"
                                 accept=".drawit"
@@ -757,7 +788,7 @@ const Board = () => {
                 </div>
             )}
 
-            <div className="fixed top-4 left-1/2 transform -translate-x-1/2 flex gap-2 p-2 bg-gray-100 rounded-lg shadow-lg z-10 border border-gray-300 items-center">
+            <div className="fixed top-4 left-1/2 transform -translate-x-1/2 flex flex-wrap justify-center gap-2 p-2 bg-gray-100 rounded-lg shadow-lg z-10 border border-gray-300 items-center max-w-[95vw]">
                 <button
                     className={`p-2 rounded-md transition-all ${tool === "selection" ? "bg-cyan-500 text-white shadow-sm" : "hover:bg-gray-200 text-gray-700"}`}
                     onClick={() => setTool("selection")}
@@ -800,7 +831,7 @@ const Board = () => {
                 >
                     <Type size={20} />
                 </button>
-                
+
                 <input
                     type="color"
                     value={strokeColor}
@@ -808,9 +839,8 @@ const Board = () => {
                     className="w-8 h-8 rounded border-none cursor-pointer"
                     title="Renk Seç"
                 />
-                
+
                 <div className="flex items-center gap-1">
-                    <span className="text-xs text-gray-600">Boyut:</span>
                     <select
                         value={textSize}
                         onChange={(e) => setTextSize(Number(e.target.value))}
@@ -824,60 +854,65 @@ const Board = () => {
                         <option value={32}>32</option>
                     </select>
                 </div>
-                
+
                 <div className="w-px h-6 bg-gray-300 mx-1"></div>
-                
+
                 <button
                     className={`p-2 rounded-md transition-all ${selectedElement ? "hover:bg-blue-100 text-blue-600" : "hover:bg-gray-200 text-gray-400"}`}
                     onClick={copySelectedElement}
                     disabled={!selectedElement}
-                    title={selectedElement ? "Kopyala (Ctrl+C)" : "Önce element seç"}
                 >
                     <Copy size={20} />
                 </button>
-                
+
                 <button
                     className={`p-2 rounded-md transition-all ${copiedElement ? "hover:bg-blue-100 text-blue-600" : "hover:bg-gray-200 text-gray-400"}`}
                     onClick={pasteCopiedElement}
                     disabled={!copiedElement}
-                    title={copiedElement ? "Yapıştır (Ctrl+V)" : "Önce element kopyala"}
                 >
                     <Clipboard size={20} />
                 </button>
-                
+
                 <button
                     className="p-2 rounded-md hover:bg-gray-200 text-gray-700 transition-all"
                     onClick={() => setShowExportMenu(!showExportMenu)}
-                    title="Dışa Aktar (Ctrl+S)"
                 >
                     <Download size={20} />
                 </button>
-                
+
                 <button
                     className="p-2 rounded-md hover:bg-gray-200 text-gray-700 transition-all"
                     onClick={undo}
-                    title="Geri Al (Ctrl+Z)"
                 >
                     <RotateCcw size={20} />
                 </button>
-                
+
                 <button
                     className="p-2 rounded-md hover:bg-gray-200 text-gray-700 transition-all"
                     onClick={() => setShowShortcutsMenu(!showShortcutsMenu)}
-                    title="Kısayollar (?)"
                 >
                     <Info size={20} />
                 </button>
             </div>
-            
+
             <canvas
                 ref={canvasRef}
                 width={window.innerWidth}
                 height={window.innerHeight}
+                
+                // Mouse Events
                 onMouseDown={startDrawing}
                 onMouseMove={draw}
                 onMouseUp={stopDrawing}
                 onMouseLeave={stopDrawing}
+
+                // Touch Events (Eklenen Kısım)
+                onTouchStart={startDrawing}
+                onTouchMove={draw}
+                onTouchEnd={stopDrawing}
+
+                // CSS touch-action (Eklenen Kısım)
+                style={{ touchAction: 'none' }} 
             />
         </div>
     );
