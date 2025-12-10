@@ -1,6 +1,6 @@
 # DrawIt – RoughJS Tabanlı React Çizim Uygulaması ✏️
 
-Modern, hızlı ve sezgisel bir canvas çizim uygulamasıdır.
+Modern, ve hızlı  bir canvas çizim uygulamasıdır.
 RoughJS kullanarak “elde çizilmiş” hissi veren şekiller üretir.
 Klavye kısayolları, metin araçları, proje kaydetme/yükleme gibi birçok gelişmiş özelliğe sahiptir.
 
@@ -24,8 +24,7 @@ Klavye kısayolları, metin araçları, proje kaydetme/yükleme gibi birçok gel
 * Renk seçme
 * Kalem kalınlığı ayarı
 * Metin boyutu ayarı
-* RoughJS ile “rough” stil oluşturma
-
+  
 ---
 
 ## 💾 Kaydetme & Yükleme
