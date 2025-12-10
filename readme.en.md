@@ -82,8 +82,7 @@ npm start
 
 ## 🖼️ Screenshot
 
-<img width="1876" height="828" alt="image" src="https://github.com/user-attachments/assets/138325e4-115d-4951-a6e3-e72025e6cd13" />
-
+<img width="1868" height="892" alt="DrawItSS" src="https://github.com/user-attachments/assets/8c3d84c7-3aa9-4c9a-a4de-136dce0ce003" />
 ---
 
 ## 📝 License
