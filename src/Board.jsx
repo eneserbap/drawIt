@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from "react";
 import rough from "roughjs";
-import { Square, Pencil, MousePointer2, RotateCcw, ArrowBigRight, Eraser, Type, Copy, Clipboard, Download, Save, Info, X } from "lucide-react";
+import { Square, Pencil, MousePointer2, RotateCcw, ArrowBigRight, Eraser, Type, Download, Save, Info, X } from "lucide-react";
 
 const roughInstance = rough.default ? rough.default : rough;
 const generator = roughInstance.generator();
@@ -57,12 +57,11 @@ const generateArrow = (x1, y1, x2, y2, color) => {
 const Board = () => {
     const [strokeColor, setStrokeColor] = useState('#000000');
     const canvasRef = useRef(null);
+    const textInputRef = useRef(null);
     const [textMode, setTextMode] = useState(false);
     const [textContent, setTextContent] = useState('');
     const [textPos, setTextPos] = useState({ x: 0, y: 0 });
     const [textSize, setTextSize] = useState(16);
-    const [cursorVisible, setCursorVisible] = useState(true);
-    const [copiedElement, setCopiedElement] = useState(null);
     const [showExportMenu, setShowExportMenu] = useState(false);
     const [showShortcutsMenu, setShowShortcutsMenu] = useState(false);
 
@@ -70,7 +69,6 @@ const Board = () => {
         const saved = localStorage.getItem("drawit-elements");
         return saved ? JSON.parse(saved) : [];
     });
-
     const [isDrawing, setIsDrawing] = useState(false);
     const [tool, setTool] = useState("pencil");
     const [points, setPoints] = useState([]);
@@ -78,13 +76,10 @@ const Board = () => {
     const [selectedElement, setSelectedElement] = useState(null);
     const [action, setAction] = useState('none');
 
-    // İmleç yanıp sönmesi
     useEffect(() => {
-        if (!textMode) return;
-        const interval = setInterval(() => {
-            setCursorVisible(prev => !prev);
-        }, 500);
-        return () => clearInterval(interval);
+        if (textMode && textInputRef.current) {
+            textInputRef.current.focus();
+        }
     }, [textMode]);
 
     useEffect(() => {
@@ -100,48 +95,13 @@ const Board = () => {
 
     useEffect(() => {
         const handleKeyDown = (event) => {
-            // Text mode kontrolü
-            if (textMode) {
-                event.preventDefault();
-                event.stopPropagation();
+            if (textMode) return;
 
-                if (event.key === 'Enter') {
-                    finishText();
-                } else if (event.key === 'Escape') {
-                    cancelText();
-                } else if (event.key === 'Backspace') {
-                    setTextContent(prev => prev.slice(0, -1));
-                } else if (event.key === 'Tab') {
-                    event.preventDefault();
-                } else if (event.key.length === 1 ||
-                    event.key === ' ' ||
-                    event.key.includes('Arrow') ||
-                    event.key.includes('Digit') ||
-                    event.key.includes('Numpad')) {
-                    if (event.key === ' ') {
-                        setTextContent(prev => prev + ' ');
-                    } else if (!event.ctrlKey && !event.metaKey && !event.altKey) {
-                        const char = event.key;
-                        setTextContent(prev => prev + char);
-                    }
-                }
-                return;
-            }
-
-            // Kısayol tuşları
             if (event.ctrlKey || event.metaKey) {
                 switch (event.key.toLowerCase()) {
                     case 'z':
                         event.preventDefault();
                         undo();
-                        break;
-                    case 'c':
-                        event.preventDefault();
-                        copySelectedElement();
-                        break;
-                    case 'v':
-                        event.preventDefault();
-                        pasteCopiedElement();
                         break;
                     case 's':
                         event.preventDefault();
@@ -149,7 +109,6 @@ const Board = () => {
                         break;
                 }
             } else {
-                // Araç kısayol tuşları
                 switch (event.key.toLowerCase()) {
                     case 'v':
                         setTool("selection");
@@ -186,7 +145,7 @@ const Board = () => {
         return () => {
             window.removeEventListener("keydown", handleKeyDown, true);
         };
-    }, [elements, textMode, textContent, selectedElement]);
+    }, [elements, textMode, selectedElement]);
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -195,7 +154,6 @@ const Board = () => {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         const rc = roughInstance.canvas(canvas);
 
-        // Önce tüm elementleri çiz
         elements.forEach(element => {
             if (element.type === 'arrow' && Array.isArray(element.roughElement)) {
                 element.roughElement.forEach(el => rc.draw(el));
@@ -207,37 +165,7 @@ const Board = () => {
                 rc.draw(element.roughElement);
             }
         });
-
-        // Text mode'ta yazılan metni ve imleci çiz
-        if (textMode) {
-            ctx.font = `${textSize}px Arial`;
-            ctx.fillStyle = strokeColor;
-            ctx.fillText(textContent, textPos.x, textPos.y + textSize);
-
-            if (cursorVisible) {
-                const textWidth = ctx.measureText(textContent).width;
-                ctx.fillStyle = strokeColor;
-                ctx.fillRect(
-                    textPos.x + textWidth,
-                    textPos.y,
-                    2,
-                    textSize
-                );
-            }
-
-            ctx.strokeStyle = '#000000';
-            ctx.lineWidth = 1;
-            ctx.setLineDash([2, 2]);
-            const textWidth = ctx.measureText(textContent).width;
-            ctx.strokeRect(
-                textPos.x - 2,
-                textPos.y - 2,
-                textWidth + 4,
-                textSize + 4
-            );
-            ctx.setLineDash([]);
-        }
-    }, [elements, textMode, textContent, textSize, strokeColor, cursorVisible]);
+    }, [elements, textSize, strokeColor]);
 
     const finishText = () => {
         if (!textContent.trim()) {
@@ -263,65 +191,12 @@ const Board = () => {
     const cancelText = () => {
         setTextMode(false);
         setTextContent('');
-        setCursorVisible(true);
     };
 
     const deleteSelectedElement = () => {
         if (selectedElement) {
             setElements(prev => prev.filter(el => el !== selectedElement));
             setSelectedElement(null);
-        }
-    };
-
-    const copySelectedElement = () => {
-        if (selectedElement) {
-            setCopiedElement({ ...selectedElement });
-            console.log("Element kopyalandı:", selectedElement);
-        } else {
-            console.log("Kopyalamak için önce bir element seç!");
-        }
-    };
-
-    const pasteCopiedElement = () => {
-        if (copiedElement) {
-            const offset = 20;
-            const newElement = {
-                ...copiedElement,
-                id: Date.now(),
-                x: copiedElement.x + offset,
-                y: copiedElement.y + offset,
-            };
-
-            if (copiedElement.type === 'arrow') {
-                newElement.x1 = copiedElement.x1 + offset;
-                newElement.y1 = copiedElement.y1 + offset;
-                newElement.x2 = copiedElement.x2 + offset;
-                newElement.y2 = copiedElement.y2 + offset;
-                newElement.roughElement = generateArrow(newElement.x1, newElement.y1, newElement.x2, newElement.y2, newElement.strokeColor || strokeColor);
-            }
-            else if (copiedElement.type === 'rectangle') {
-                newElement.roughElement = generator.rectangle(newElement.x, newElement.y, newElement.width, newElement.height, {
-                    stroke: newElement.strokeColor || strokeColor,
-                    strokeWidth: 3
-                });
-            }
-            else if (copiedElement.type === 'pencil') {
-                newElement.points = copiedElement.points.map(p => [p[0] + offset, p[1] + offset]);
-                newElement.roughElement = generator.linearPath(newElement.points, {
-                    stroke: newElement.strokeColor || strokeColor,
-                    strokeWidth: 2,
-                    roughness: 0.5
-                });
-            }
-            else if (copiedElement.type === 'text') {
-                newElement.roughElement = null;
-            }
-
-            setElements(prev => [...prev, newElement]);
-            setSelectedElement(newElement);
-            console.log("Element yapıştırıldı:", newElement);
-        } else {
-            console.log("Yapıştırmak için önce bir element kopyala!");
         }
     };
 
@@ -394,11 +269,9 @@ const Board = () => {
         reader.readAsText(file);
     };
 
-    // --- YENİ EKLENEN KISIM: KOORDİNAT HESAPLAYICI ---
     const getCoordinates = (event) => {
         const canvas = canvasRef.current;
         
-        // Touch events
         if (event.touches && event.touches.length > 0) {
             const rect = canvas.getBoundingClientRect();
             return {
@@ -406,7 +279,6 @@ const Board = () => {
                 y: event.touches[0].clientY - rect.top
             };
         } else if (event.changedTouches && event.changedTouches.length > 0) {
-            // Touch end event
             const rect = canvas.getBoundingClientRect();
             return {
                 x: event.changedTouches[0].clientX - rect.left,
@@ -414,16 +286,13 @@ const Board = () => {
             };
         }
         
-        // Mouse events
         return {
             x: event.nativeEvent.offsetX,
             y: event.nativeEvent.offsetY
         };
     };
-    // ------------------------------------------------
 
     const startDrawing = (event) => {
-        // Telefonda kaydırmayı engelle
         if(event.cancelable) event.preventDefault();
 
         const { x: offsetX, y: offsetY } = getCoordinates(event);
@@ -453,7 +322,6 @@ const Board = () => {
             setTextMode(true);
             setTextPos({ x: offsetX, y: offsetY });
             setTextContent('');
-            setCursorVisible(true);
             return;
         }
 
@@ -466,7 +334,6 @@ const Board = () => {
     };
 
     const draw = (event) => {
-        // Telefonda kaydırmayı engelle
         if(event.cancelable) event.preventDefault();
         
         if (textMode) return;
@@ -595,7 +462,6 @@ const Board = () => {
     };
 
     const stopDrawing = (event) => {
-        // Telefonda kaydırmayı engelle
         if(event.cancelable) event.preventDefault();
 
         if (textMode) return;
@@ -685,8 +551,6 @@ const Board = () => {
         { key: 'T', desc: 'Metin' },
         { key: 'Delete', desc: 'Seçili elementi sil' },
         { key: 'Ctrl + Z', desc: 'Geri al' },
-        { key: 'Ctrl + C', desc: 'Kopyala' },
-        { key: 'Ctrl + V', desc: 'Yapıştır' },
         { key: 'Ctrl + S', desc: 'Dışa aktar menüsü' },
         { key: '?', desc: 'Kısayolları göster' },
     ];
@@ -697,7 +561,7 @@ const Board = () => {
             style={{
                 backgroundImage: 'radial-gradient(#ccc 1px, transparent 1px)',
                 backgroundSize: '20px 20px',
-                touchAction: 'none' // Tüm sayfa için de ek önlem
+                touchAction: 'none'
             }}
         >
             {elements.length === 0 && (
@@ -711,8 +575,40 @@ const Board = () => {
             )}
 
             {textMode && (
-                <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-black text-white px-4 py-2 rounded-lg text-sm z-50 whitespace-nowrap">
-                    Yazı Modu: (Enter: Kaydet)
+                <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-30 pointer-events-none">
+                    <div className="bg-white rounded-lg shadow-xl p-6 pointer-events-auto" style={{ minWidth: '300px' }}>
+                        <h3 className="text-lg font-semibold mb-3 text-gray-800">Metin Gir</h3>
+                        <input
+                            ref={textInputRef}
+                            type="text"
+                            value={textContent}
+                            onChange={(e) => setTextContent(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    finishText();
+                                } else if (e.key === 'Escape') {
+                                    cancelText();
+                                }
+                            }}
+                            className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-cyan-500"
+                            placeholder="Metni gir..."
+                            autoFocus
+                        />
+                        <div className="flex gap-2 mt-4">
+                            <button
+                                onClick={finishText}
+                                className="flex-1 bg-cyan-500 text-white px-4 py-2 rounded hover:bg-cyan-600 transition"
+                            >
+                                Kaydet
+                            </button>
+                            <button
+                                onClick={cancelText}
+                                className="flex-1 bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400 transition"
+                            >
+                                İptal
+                            </button>
+                        </div>
+                    </div>
                 </div>
             )}
 
@@ -858,22 +754,6 @@ const Board = () => {
                 <div className="w-px h-6 bg-gray-300 mx-1"></div>
 
                 <button
-                    className={`p-2 rounded-md transition-all ${selectedElement ? "hover:bg-blue-100 text-blue-600" : "hover:bg-gray-200 text-gray-400"}`}
-                    onClick={copySelectedElement}
-                    disabled={!selectedElement}
-                >
-                    <Copy size={20} />
-                </button>
-
-                <button
-                    className={`p-2 rounded-md transition-all ${copiedElement ? "hover:bg-blue-100 text-blue-600" : "hover:bg-gray-200 text-gray-400"}`}
-                    onClick={pasteCopiedElement}
-                    disabled={!copiedElement}
-                >
-                    <Clipboard size={20} />
-                </button>
-
-                <button
                     className="p-2 rounded-md hover:bg-gray-200 text-gray-700 transition-all"
                     onClick={() => setShowExportMenu(!showExportMenu)}
                 >
@@ -900,18 +780,15 @@ const Board = () => {
                 width={window.innerWidth}
                 height={window.innerHeight}
                 
-                // Mouse Events
                 onMouseDown={startDrawing}
                 onMouseMove={draw}
                 onMouseUp={stopDrawing}
                 onMouseLeave={stopDrawing}
 
-                // Touch Events (Eklenen Kısım)
                 onTouchStart={startDrawing}
                 onTouchMove={draw}
                 onTouchEnd={stopDrawing}
 
-                // CSS touch-action (Eklenen Kısım)
                 style={{ touchAction: 'none' }} 
             />
         </div>
