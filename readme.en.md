@@ -63,7 +63,7 @@ It includes advanced features such as keyboard shortcuts, text tools, project sa
 ## 📦 Installation
 
 ```bash
-git clone [https://github.com/eneserbap/drawIt](https://github.com/eneserbap/drawIt.git)
+git clone https://github.com/eneserbap/drawIt.git
 cd drawIt
 npm install
 npm start
