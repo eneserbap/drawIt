@@ -64,7 +64,7 @@ Klavye kısayolları, metin araçları, proje kaydetme/yükleme gibi birçok gel
 ## 📦 Kurulum
 
 ```bash
-git clone [<repo-link>](https://github.com/eneserbap/drawIt.git)
+git clone (https://github.com/eneserbap/drawIt.git)
 cd project-folder
 npm install
 npm start
